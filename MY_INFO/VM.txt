@@ -1,0 +1,73 @@
+1. Install VM
+
+https://github.com/codesshaman/inception/blob/main/00_INSTALL_SYSTEM.md
+from subject" either the penultimate stable version of Alpine or Debian" = lasts bebore last stable version) not the last version
+
+[]  DEBIAN VERSION: 13v for VM, 12v for Docker. amd64(from computer settings)
+    for VM I will use latest 13.version, but for docker (penultimate=previous) Debian 12 “Bookworm"
+    https://wiki.debian.org/DebianReleases
+    https://www.debian.org/releases/
+    latest/current stable :  Debian 13.0.0 “Trixie” → current stable release.
+    penultimate(one before stable)  Debian 12 “Bookworm” → now the penultimate stable (previous stable).
+
+    -school computer(in settings): os type 64 bit, grapic AMD => need download 64bitAMD ISO DEBIAN
+        https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/ 
+
+[] INSTALL VM
+    - Oracle Virtualbox
+
+
+[] SHUTDOWN vm in terminal:
+    sudo poweroff
+
+
+[] SSH add to use github and Intra
+    0. Add port to connect to VM
+        to get a usable IP for scp
+            ✅ Option A: Use Port Forwarding (with NAT)
+
+            Shut down VM.
+
+            In VirtualBox Manager → Settings → Network → Adapter 1 → Advanced → Port Forwarding.
+
+            Add a rule:
+
+            Name: SSH
+            Protocol: TCP
+            Host IP: 127.0.0.1
+            Host Port: 2222
+            Guest IP: leave empty
+            Guest Port: 22
+
+            Now start VM again.
+            From host, you can connect with:
+                ssh -p 2222 akurmyza@127.0.0.1
+                scp -P 2222 -r ~/.ssh akurmyza@127.0.0.1:~/
+
+    1. 1️ Update package list
+
+        Inside your VM run:
+        sudo apt update
+        his fetches the list of available packages. Without this, Debian doesn’t know where openssh-server is.
+
+    2. Install SSH server
+        sudo apt install openssh-server -y
+
+    3. Start and enable SSH service
+        sudo systemctl enable ssh
+        sudo systemctl start ssh
+    4. Check:
+            sudo systemctl status ssh
+
+    5.  From your host terminal(normal terminal, not VM!!!)
+    from terminal normal, not vm;
+         scp -P 2222 -r /home/akurmyza/.ssh akurmyza@127.0.0.1:~/
+    test:
+        ssh -T git@git.42.fr
+        => Welcome to GitLab, @akurmyza!
+    
+    6. in VM:
+        chmod 700 ~/.ssh
+        chmod 600 ~/.ssh/id_rsa
+        chmod 644 ~/.ssh/id_rsa.pub
+        chmod 644 ~/.ssh/known_hosts
