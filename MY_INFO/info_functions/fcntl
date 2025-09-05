@@ -1,0 +1,46 @@
+What is systemctl?
+
+It’s a command-line tool used to control the systemd system manager.
+
+systemd is like the “brain” that manages background programs (services/daemons) on modern Linux systems.
+
+Think of it as a remote control for starting, stopping, and checking services.
+
+systemctl [action] [service]
+
+Common actions:
+
+    start → start a service now
+
+    stop → stop a service now
+
+    restart → stop and start again
+
+    status → show whether a service is running
+
+    enable → make the service auto-start when VM boots
+
+    disable → prevent service from auto-starting
+
+🔹 Examples (with Docker)
+
+When you install Docker in your VM, you’ll manage it with systemctl:
+sudo systemctl start docker
+
+Starts the Docker service (daemon).
+sudo systemctl enable docker
+
+Ensures Docker will always start when the VM boots.
+sudo systemctl status docker
+
+Shows logs + whether Docker is running or not.
+sudo systemctl stop docker
+
+Why you need it for Inception
+
+After installing Docker, the service must be running in the background; otherwise docker commands won’t work.
+
+That’s why you’ll run:
+
+sudo systemctl enable docker
+sudo systemctl start docker
