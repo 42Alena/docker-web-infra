@@ -17,7 +17,6 @@ COPY conf/nginx.conf /etc/nginx/nginx.conf
 COPY conf/index.html /var/www/html/index.html
 
 
-
 EXPOSE 443
 # Docker to run NGINX in foreground
 CMD ["nginx", "-g", "daemon off;"]

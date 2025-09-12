@@ -7,15 +7,42 @@ services:
     image: nginx
     ports:
       - "443:443"
+    volumes:
+      - ./requirements/nginx/conf:/etc/nginx/conf.d/  
+      - ./requirements/nginx/tools:/etc/nginx/ssl/ 
     restart: on-failure
+    # depends_on:              
+    #   - wordpress
     networks: 
       - inception
 
-  # mariadb:
+  mariadb:
+      container_name: mariadb
+      build:
+        context: ./requirements/mariadb 
+        dockerfile: Dockerfile
+      image: mariadb
+      restart: on-failure
+      env_file: .env
+      volumes:
+        - mariadb_data:/var/lib/mysql
+      networks: 
+        - inception
+      expose:
+        - "3306"
 
-  # wordpress:
+    # wordpress:
 
 
 networks:
   inception:           
     driver: bridge
+
+# Persistent volumes (host paths in /home/akurmyza/data)
+volumes:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: home/akurmyza/data/maraidb
