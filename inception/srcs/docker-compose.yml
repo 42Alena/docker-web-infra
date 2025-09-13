@@ -13,8 +13,8 @@ services:
     restart: on-failure
     # depends_on:              
     #   - wordpress
-    networks: 
-      - inception
+    # networks: 
+    #   - inception
 
   mariadb:
       container_name: mariadb
@@ -26,23 +26,32 @@ services:
       env_file: .env
       volumes:
         - mariadb_data:/var/lib/mysql
-      networks: 
-        - inception
+      # networks: 
+      #   - inception
+      
+      # only for test. TODO: delete - "3306:3306"
       expose:
-        - "3306"
+        - "3306:3306"
+      # TODO: uncomennt => it is corecet to use 3306 only, not 3306:3306
+      # expose:
+        # - "3306"
 
     # wordpress:
 
 
-networks:
-  inception:           
-    driver: bridge
+# networks:
+#   inception:           
+#     driver: bridge
 
+#TODO: volumes must mount last as everything work
 # Persistent volumes (host paths in /home/akurmyza/data)
-volumes:
-  mariadb_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: home/akurmyza/data/maraidb
+# volumes:
+#   mariadb_data:
+#     driver: local
+#     driver_opts:
+#       type: none
+#       o: bind
+#       # --- Use this on  Mac ---
+#       device: /Users/alenakurmyza/data/mariadb
+      # --- Use this at School VM ---
+      # device: /home/akurmyza/data/mariadb
