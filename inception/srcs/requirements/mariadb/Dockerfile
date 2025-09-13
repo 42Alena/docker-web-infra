@@ -1,4 +1,4 @@
-FROM debian: bookworm
+FROM debian:bookworm
 
 RUN	apt update && \
 	apt install -y --no-install-recommends --no-install-suggests \
