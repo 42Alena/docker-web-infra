@@ -38,3 +38,30 @@ Useful if nginx crashes at startup.
 	docker compose down
 Stops and removes containers, but not images.
 
+
+#  IF not created folder yet =>  create the data folders on your host:
+(In the school VM you’ll switch to /home/<login>/data/... — but on macOS, /Users/... is correct.)
+
+`mkdir -p ~/data/mariadb`
+
+`mkdir -p ~/data/wordpress`
+
+On macOS, this expands to /Users/alenakurmyza/data/....
+in Docker compose:
+```
+	volumes:
+	...   
+
+	   # --- Use this on your Mac ---
+      device: /Users/alenakurmyza/data/mariadb
+      # --- Use this at School VM ---
+      # device: /home/akurmyza/data/mariadb
+```
+### Then rebuild and run again
+```
+docker compose down -v                # clean old containers + volumes
+docker compose up -d mariadb
+```
+
+
+

@@ -5,15 +5,14 @@ RUN	apt update && \
 	mariadb-server && \
 	rm -rf /var/lib/apt/lists/*
 
-# RUN addgroup mysql 
-RUN adduser mysql mysql
-
+# Ensure correct permissions
 RUN mkdir -p /var/lib/mysql /run/mysqld; \
 	chown -R mysql:mysql /var/lib/mysql /run/mysqld; \
-	chmod 1777 /run/mysqld; 
+	chmod 755 /run/mysqld; 
 
-# Copy   own config + init script
-COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
+# Leave the original 50-server.cnf untouched
+# Add custom 51-server.cnf (loaded later, overrides needed settings)
+COPY conf/51-server.cnf /etc/mysql/mariadb.conf.d/
 
 # Copy own  init script
 COPY tools/init_db.sh /init_db.sh
@@ -21,8 +20,8 @@ RUN chmod +x /init_db.sh
 
 EXPOSE 3306
 
-# First run executes init script, then CMD starts server
-ENTRYPOINT [ "/init_db.sh" ]
+# ENTRYPOINT runs script init_db.sh (PID 1). init_db.sh must end with: exec "$@"  → hands off to CMD.
+ENTRYPOINT ["/init_db.sh"]
 
-USER mysql
-CMD ["mariadbd"]  
+# CMD supplies the server binary to exec at the end of init_db.sh (no backgrounding).
+CMD ["mariadbd"] 

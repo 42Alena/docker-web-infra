@@ -24,8 +24,8 @@ services:
       image: mariadb
       restart: on-failure
       env_file: .env
-      volumes:
-        - mariadb_data:/var/lib/mysql
+      # volumes:
+      #   - mariadb_data:/var/lib/mysql
       # networks: 
       #   - inception
       
