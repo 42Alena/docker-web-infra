@@ -10,6 +10,9 @@ services:
     volumes:
       - ./requirements/nginx/conf:/etc/nginx/conf.d/  
       - ./requirements/nginx/tools:/etc/nginx/ssl/ 
+      # - wordpress_data:/var/www/wordpress 
+    env_file:
+      - .env  
     restart: on-failure
     # depends_on:              
     #   - wordpress
@@ -22,19 +25,15 @@ services:
         context: ./requirements/mariadb 
         dockerfile: Dockerfile
       image: mariadb
-      restart: on-failure
       env_file: .env
+      restart: on-failure
       # volumes:
       #   - mariadb_data:/var/lib/mysql
       # networks: 
       #   - inception
       
-      # only for test. TODO: delete - "3306:3306"
       expose:
-        - "3306:3306"
-      # TODO: uncomennt => it is corecet to use 3306 only, not 3306:3306
-      # expose:
-        # - "3306"
+        - "3306"
 
     # wordpress:
 
@@ -51,7 +50,4 @@ services:
 #     driver_opts:
 #       type: none
 #       o: bind
-#       # --- Use this on  Mac ---
-#       device: /Users/alenakurmyza/data/mariadb
-      # --- Use this at School VM ---
-      # device: /home/akurmyza/data/mariadb
+      # device: ${DATA_PATH}/mariadb 

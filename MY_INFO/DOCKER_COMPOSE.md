@@ -1,3 +1,10 @@
+Set environment variables within your container's environment
+- https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/
+
+Tip
+* Don't use environment variables to pass sensitive information, such as passwords, in to your containers. Use secrets instead.
+
+
 # Compose works from the folder where your docker-compose.yml is (that’s in srcs/).
 	build:
       context: ./requirements/nginx 
@@ -65,3 +72,26 @@ docker compose up -d mariadb
 
 
 
+# USe environment .env for passwords:
+
+## environment: with ${VAR}
+```bash
+environment:
+  DB_NAME: ${DB_NAME}
+  DB_USER: ${DB_USER}
+```
+Lets you explicitly control which vars are passed.
+
+Useful if .env has extra vars you don’t want inside the container.
+
+More verbose, easy to make mistakes.
+
+To be safe, always define the variable in .env.
+
+```bash
+env_file:
+  - .env
+```
+Loads all variables from .env into the container.
+
+Easiest and matches the subject’s recommended practice

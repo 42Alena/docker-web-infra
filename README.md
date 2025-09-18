@@ -20,3 +20,7 @@ This repository sets up a production-like environment using containers:
 make        # Build and start containers
 make down   # Stop containers (data preserved)
 make clean  # Remove containers and volumes (fresh start)
+```
+
+The file srcs/.env is provided with placeholders for evaluation.
+For local testing, copy srcs/.env.local → srcs/.env.

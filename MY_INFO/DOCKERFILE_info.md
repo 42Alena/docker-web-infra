@@ -1,3 +1,7 @@
+# Dockerfile references!!:
+https://docs.docker.com/reference/dockerfile/
+
+https://docs.docker.com/reference/dockerfile/#env
 
 # ENTRYPOINT ["/init_db.sh"]
 - ENTRYPOINT: first thing the container runs.
@@ -14,3 +18,4 @@ Very important: inside the script " .sh" must end with:  `exec "$@"`
 - CMD: the program that starts after the script finishes.
 - Our script will exec this → it becomes the main server process.
 - No & , no background — it runs in front.
+

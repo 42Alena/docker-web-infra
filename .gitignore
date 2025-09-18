@@ -1,0 +1,2 @@
+# .env.save.in.virtualmashine only! dont push to git
+/inception/srcs/.env

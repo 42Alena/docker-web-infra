@@ -1,9 +1,19 @@
 # MARIADB
 
-https://mariadb.com/
-https://hub.docker.com/_/mariadb
-https://mariadb.com/docs/server/mariadb-quickstart-guides/installing-mariadb-server-guide
-https://github.com/MariaDB/mariadb-docker
+- https://mariadb.com/
+
+- https://hub.docker.com/_/mariadb
+
+- https://mariadb.com/docs/server/mariadb-quickstart-guides/installing-mariadb-server-guide
+- https://github.com/MariaDB/mariadb-docker
+
+Create user:
+
+- https://mariadb.com/docs/server/reference/sql-statements/account-management-sql-statements/create-user
+- https://dev.mysql.com/doc/refman/8.0/en/create-user.html
+
+Set password :
+- https://mariadb.com/docs/server/reference/sql-statements/account-management-sql-statements/set-password
 
 #  IF not created folder yet =>  create the data folders on your host:
 (In the school VM you’ll switch to /home/<login>/data/... — but on macOS, /Users/... is correct.)
@@ -163,5 +173,158 @@ Perfect 👍 — I’ll make you a **full exam-style test table** for MariaDB, i
 * Data is **persistent after reboot**.
 
 ---
+---
 
-👉 Do you want me to now prepare the **exact one-liner** that evaluators often ask for (connect directly without opening bash)?
+# 🚀 Real MariaDB Setup (from scratch)
+
+### Step 1 — Open a shell inside container
+
+🔑 So we can run commands manually (like evaluator might ask you).
+
+```bash
+docker exec -it mariadb bash
+```
+
+Now you are inside the container.
+
+---
+
+### Step 2 — Connect to MariaDB as root
+
+🔑 You must be able to log in as root (using password from `.env`).
+
+```bash
+mysql -u root -p
+```
+
+* `-u root` = login with user root.
+* `-p` = prompt for password (type the `$DB_ROOT_PASS` from `.env`).
+
+✅ If login works, you see:
+
+```
+MariaDB [(none)]>
+```
+
+---
+
+### Step 3 — Show existing databases
+
+🔑 Confirm system tables exist.
+
+```sql
+SHOW DATABASES;
+```
+
+✅ You should see:
+
+```
+information_schema
+mysql
+performance_schema
+sys
+```
+
+(+ maybe `wordpress` if you already created it).
+
+---
+
+### Step 4 — Create your project database
+
+🔑 Subject requires: **a dedicated WordPress DB**.
+
+```sql
+CREATE DATABASE wordpress;
+```
+
+✅ Check:
+
+```sql
+SHOW DATABASES;
+```
+
+→ Now includes `wordpress`.
+
+---
+
+### Step 5 — Create a WordPress user
+
+🔑 Subject requires: **a non-root user** with password, for WordPress.
+
+```sql
+CREATE USER 'wpuser'@'%' IDENTIFIED BY 'wppass';
+```
+
+* `'wpuser'` = your `$DB_USER`.
+* `'%'` = can connect from any host (important, since WP runs in a different container).
+* `'wppass'` = your `$DB_PASS`.
+
+✅ Check:
+
+```sql
+SELECT User, Host FROM mysql.user;
+```
+
+→ Should list `wpuser` with Host `%`.
+
+---
+
+### Step 6 — Grant privileges
+
+🔑 WordPress needs full rights on its DB.
+
+```sql
+GRANT ALL PRIVILEGES ON wordpress.* TO 'wpuser'@'%';
+FLUSH PRIVILEGES;
+```
+
+* `wordpress.*` = all tables inside `wordpress` DB.
+* `FLUSH PRIVILEGES;` = apply changes immediately.
+
+✅ Check:
+
+```sql
+SHOW GRANTS FOR 'wpuser'@'%';
+```
+
+→ Should show `GRANT ALL PRIVILEGES ON wordpress.*`.
+
+---
+
+### Step 7 — Test the new user
+
+Exit root session:
+
+```sql
+exit;
+```
+
+Reconnect as the new user:
+
+```bash
+mysql -u wpuser -p wppass wordpress
+```
+
+✅ If it connects and prompt shows:
+
+```
+MariaDB [wordpress]>
+```
+
+→ User works and has access.
+
+---
+
+# ✅ Summary (what subject requires you to prove)
+
+1. **Root login works** (with env password).
+2. **Your DB exists** (e.g., `wordpress`).
+3. **Custom user exists** (not root).
+4. **User has privileges only on that DB**.
+5. **Persistence**: if you restart container, DB and user are still there.
+
+---
+
+# ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASS}';
+
+ ALTER USER = SQL command to change an existing user account. Here we’re modifying the root account.
