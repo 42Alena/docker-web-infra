@@ -11,8 +11,7 @@ services:
       - ./requirements/nginx/conf:/etc/nginx/conf.d/  
       - ./requirements/nginx/tools:/etc/nginx/ssl/ 
       # - wordpress_data:/var/www/wordpress 
-    env_file:
-      - .env  
+    env_file: ./.env
     restart: on-failure
     # depends_on:              
     #   - wordpress
@@ -25,7 +24,7 @@ services:
         context: ./requirements/mariadb 
         dockerfile: Dockerfile
       image: mariadb
-      env_file: .env
+      env_file: ./.env
       restart: on-failure
       # volumes:
       #   - mariadb_data:/var/lib/mysql

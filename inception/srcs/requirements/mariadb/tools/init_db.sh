@@ -22,17 +22,40 @@ else
     echo "[init_db.sh] MariaDB system database already exists, skipping init."
 fi
 
-#change root passw(was no passw)
-ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASS}';
-FLUSH PRIVILEGES;
+# start temporary MariaDB server (socket only, no TCP)
+echo "[init_db.sh] Starting temporary MariaDB server..."
+mariadbd --skip-networking \
+         --socket=/run/mysqld/mysqld.sock \
+         --datadir=/var/lib/mysql &
+pid="$!"
 
-# setup database, users, permissions, etc.. 
+# wait until server is ready
+echo "[init_db.sh] Waiting for MariaDB to be ready..."
+until mysqladmin --socket=/run/mysqld/mysqld.sock ping >/dev/null 2>&1; do
+    sleep 1
+done
 
-# create database for ENV_XXX
-# create user if not exist with passw 
-# grant permssions to database for user
-# if init.sql exists - import db  
+# change root passw (no passw by default), create user1, database
+echo "[init_db.sh] Running initial SQL setup..."
+mysql --socket=/run/mysqld/mysqld.sock -u root <<-EOSQL
+    ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASS}';
+    FLUSH PRIVILEGES;
+    CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;
+    CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';
+    GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'%';
+    FLUSH PRIVILEGES;
+EOSQL
 
 
-# run everything in CMD 
+
+# stop temporary MariaDB server
+echo "[init_db.sh] Shutting down temporary MariaDB server..."
+mysqladmin --socket=/run/mysqld/mysqld.sock -u root -p"${DB_ROOT_PASS}" shutdown
+
+
+
+
+
+# replace this script with the main MariaDB server process (from CMD ["mariadbd"]  in Dockerfile)
+echo "[init_db.sh] Starting the main MariaDB server..."
 exec "$@"

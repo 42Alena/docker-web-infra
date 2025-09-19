@@ -182,6 +182,17 @@ docker stop mariadb
 docker rm mariadb
 docker rmi mariadb
 ```
+or
+```
+docker compose down -v
+docker compose up -d --build mariadb
+
+docker compose ps            # shows status (Up/Restarting/Exited)
+docker logs -f mariadb       # follow logs (Ctrl+C to stop following)
+
+docker logs   mariadb
+
+```
 
  same with docker compose: 
  ```bash
@@ -252,3 +263,111 @@ exit
 # Check logs outside container
 docker logs mariadb
 ```
+
+## Change root password (no passw for root at begin)
+
+https://mariadb.com/docs/server/clients-and-utilities/deployment-tools/mariadb-install-db 
+
+```
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASS}';
+FLUSH PRIVILEGES;
+```
+BUT! It was not working
+
+`docker logs mariadb`
+```
+[init_db.sh] MariaDB system database already exists, skipping init.
+ERROR 2002 (HY000): Can't connect to local server through socket '/run/mysqld/mysqld.sock' (2)
+```
+Need start temporary mdb server
+
+run SQL for config table and users
+
+stop it  temporary mdb server
+## => Temporary MariaDB Server Commands
+Perfect 👍 Let’s make a **Markdown snippet** you can drop straight into your docs/README.
+This shows exactly how to **start and stop a temporary MariaDB server** inside the `init_db.sh` script.
+
+---
+
+##  Temporary MariaDB Server Commands (for `init_db.sh`) to run SQL setup before the real server starts:
+
+```bash
+# Start temporary MariaDB server (background)
+mariadbd --skip-networking \
+         --socket=/run/mysqld/mysqld.sock \
+         --datadir=/var/lib/mysql &
+
+# Store its PID (process ID) to control it later
+pid="$!"
+
+# Wait until server is ready
+until mysqladmin --socket=/run/mysqld/mysqld.sock ping >/dev/null 2>&1; do
+    sleep 1
+done
+
+# Run SQL commands against the temporary server
+mysql --socket=/run/mysqld/mysqld.sock -u root -e "SELECT VERSION();"
+
+# Stop the temporary server cleanly
+mysqladmin --socket=/run/mysqld/mysqld.sock -u root -p"$DB_ROOT_PASS" shutdown
+```
+
+---
+
+### Explanation of each command
+
+* `mariadbd --skip-networking` → starts MariaDB **without TCP**, only local socket.
+* `--socket=/run/mysqld/mysqld.sock` → defines the socket path (client must use the same).
+* `&` → runs in background so script can continue.
+* `pid="$!"` → captures PID of last background process (optional, if you prefer to `kill $pid` instead of `mysqladmin shutdown`).
+* `mysqladmin ping` → waits until the server is responsive.
+* `mysql ...` → run SQL setup (create DB, users, etc.).
+* `mysqladmin shutdown` → cleanly stops the temporary server.
+
+## connect directly to the MariaDB server inside the container
+```
+docker exec -it mariadb mariadb -u root -p
+```
+enter pass for root from .env
+
+# CHeck mariadb
+```bash
+#List all databases (should include your custom one, e.g. wordpress)
+SHOW DATABASES;
+
+# Switch into system DB mysql (where users are stored)  List all users 
+USE mysql;
+SELECT User, Host FROM user;
+
+
+# SAME as up, but without changing to myscl database List all users (prove your wpuser exists)
+SELECT User, Host FROM mysql.user;
+
+# Check privileges for wpuser
+SHOW GRANTS FOR 'wpuser'@'%';
+
+# Switch into your DB (prove it works)
+USE wordpress;
+
+# Show tables (may be empty at first, but command must succeed)
+SHOW TABLES;
+
+EXIT;
+```
+
+# !Persistence test: Stop and start containers (without -v):
+```
+docker compose down
+docker compose up -d
+
+ocker exec -it mariadb mariadb -u root -p
+```
+###  | User        | Host      |
+### | wpuser      | %         |
+% is a wildcard that means any host
+means → wpuser can connect from any IP / any hostname, not just localhost.
+
+## SHOW GRANTS FOR 'wpuser'@'%';
+## 'wpuser'@'%'
+→ wpuser can log in from any machine (container-to-container, remote, etc.) if credentials match.
