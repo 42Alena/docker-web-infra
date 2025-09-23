@@ -13,9 +13,11 @@ RUN openssl req -x509 -nodes -newkey rsa:2048 -days 365 \
     -out /etc/nginx/ssl/server.crt \
     -subj "/C=DE/ST=BE/L=Berlin/O=42/OU=Inception/CN=localhost"
 
+# Copy my Nginx config (server block) into container
 COPY conf/nginx.conf /etc/nginx/nginx.conf
-COPY conf/index.html /var/www/html/index.html
 
+# Copy static index file (only for test before wordpress: if Nginx + SSL works by opening https://login.42.fr and seeing this page)
+COPY conf/index.html /var/www/html/index.html
 
 EXPOSE 443
 # Docker to run NGINX in foreground

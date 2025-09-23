@@ -7,16 +7,14 @@ services:
     image: nginx
     ports:
       - "443:443"
-    volumes:
-      - ./requirements/nginx/conf:/etc/nginx/conf.d/
-      - ./requirements/nginx/tools:/etc/nginx/ssl/
-      # - wordpress_data:/var/www/wordpress
     env_file: ./.env
     restart: on-failure
     # depends_on:
     #   - wordpress
     # networks:
     #   - inception
+    #  volumes:
+    #   - wordpress:/var/www/wordpress   # share WordPress files
 
   mariadb:
     container_name: mariadb
@@ -45,6 +43,8 @@ services:
     #   - mariadb
     # networks:
     #   - inception
+    # volumes:
+    #   - wordpress:/var/www/wordpress
     # expose:
     #   - "9000"
 # networks:
@@ -59,4 +59,11 @@ services:
 #     driver_opts:
 #       type: none
 #       o: bind
-# device: ${DATA_PATH}/mariadb
+#       device: ${DATA_PATH}/mariadb
+
+# wordpress:
+#   driver: local
+#   driver_opts:
+#     type: none
+#     o: bind
+#     device: ${DATA_PATH}/wordpress

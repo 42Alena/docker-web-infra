@@ -11,7 +11,7 @@ RUN mkdir -p /var/lib/mysql /run/mysqld; \
 	chmod 755 /run/mysqld; 
 
 # Leave the original 50-server.cnf untouched
-# Add custom 51-server.cnf (loaded later, overrides needed settings)
+# Add custom 51-server.cnf (loaded later, overrides needed settings) to edit config then
 COPY conf/51-server.cnf /etc/mysql/mariadb.conf.d/
 
 # Copy own  init script

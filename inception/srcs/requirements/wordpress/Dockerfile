@@ -16,3 +16,16 @@ RUN wget https://wordpress.org/latest.tar.gz -P /var/www \
 	&& tar -xzf /var/www/latest.tar.gz -C /var/www \
 	&& rm /var/www/latest.tar.gz \
 	&& chown -R root:root /var/www/wordpress
+
+
+# https://make.wordpress.org/cli/handbook/guides/installing/
+RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+	&& chmod +x wp-cli.phar \
+	&& mv wp-cli.phar /usr/local/bin/wp
+
+
+# Leave the original /var/www/wordpress/wp-config-sample.php  untouched
+# make copy from it to own (loaded later, overrides needed settings), to edit config then
+COPY  conf/wp-config.php  /var/www/wordpress/
+
+CMD ["php-fpm8.2", "-F"]

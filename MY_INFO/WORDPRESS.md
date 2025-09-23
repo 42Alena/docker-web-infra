@@ -126,8 +126,102 @@ This avoids permission issues when WordPress needs to write files (uploads, plug
 
 open shell inside container
 `docker exec -it wordpress bash`
-```
+
 
 You are using FROM debian:bookworm → Debian 12.
 
 Debian 12 ships PHP 8.2 packages, not PHP 7.4.
+
+## Right now your Dockerfile ends after unpacking WordPress files.
+
+But you don’t tell Docker what process to keep running.
+
+
+CMD ["php-fpm8.2", "-F"]
+
+    php-fpm8.2 → starts PHP FastCGI manager
+
+    -F → foreground mode (container stays alive)
+
+## check container
+
+```bash
+php-fpm8.2 -v
+# -t test
+php-fpm8.2 -t
+
+# check WP files
+ls -l /var/www/wordpress | head
+
+# -m (modules) This confirms WordPress can talk to MariaDB.
+php -m | grep mysql
+wget --version
+curl --version
+tar --version
+unzip -v
+
+```
+____________
+_________________
+
+# Install wp-cli 
+## is the command-line interface for WordPress. You can update plugins, configure multisite installations and much more, without using a web browser.
+from https://make.wordpress.org/cli/handbook/guides/installing/
+```bash
+RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+	&& chmod +x wp-cli.phar \
+	&& mv wp-cli.phar /usr/local/bin/wp
+```
+Then, check if it works:
+(docker exec -it wordpress bash)
+` php wp-cli.phar --info`
+
+ `wp --info.` If WP-CLI is installed successfully, you’ll see output like this..
+ or 
+ docker exec -it wordpress wp --info
+
+ # @Task: you shouldn’t see the WordPress Installation page
+
+
+ "WordPress Installation page"
+When you install WordPress manually:
+
+You visit your site (e.g. http://localhost or https://login.42.fr).
+
+WordPress detects there is no wp-config.php file.
+
+It shows the installation wizard — a form in the browser that asks:
+
+Site title| Admin username | Admin password | Admin email| (Optional) Search engine visibility
+
+
+
+ ## COnfig  wp-config.php to not see Wordpress Installation Page from 
+ https://developer.wordpress.org/advanced-administration/before-install/howto-install/#the-famous-5-minute-installation 
+
+ "3. (Optional) Find and rename wp-config-sample.php to wp-config.php, then edit the file (see Editing wp-config.php) and add your database information."
+ 
+ ## after install /var/www/wordpresswp-config-sample.php
+ Normally (without auto setup)
+ ```bash
+ root@0925a224b353:/# ls /var/www/wordpress/wp-
+wp-activate.php       wp-comments-post.php  wp-cron.php           wp-load.php           wp-settings.php       
+wp-admin/             wp-config-sample.php  wp-includes/          wp-login.php          wp-signup.php         
+wp-blog-header.php    wp-content/           wp-links-opml.php     wp-mail.php           wp-trackback.php  
+root@0925a224b353:/# ls /var/www/wordpress/wp-config-sample.php 
+/var/www/wordpress/wp-config-sample.php
+root@0925a224b353:/# cat /var/www/wordpress/wp-config-sample.php 
+<?php
+/**
+ * The base configuration for WordPress
+ *
+```
+## 1. copytext from cat /var/www/wordpress/wp-config-sample.php  to my own conf/wp-config.php,
+## 2. dockerfile:
+
+```bash
+ # Leave the original /var/www/wordpress/wp-config-sample.php  untouched
+# make copy from it to own (loaded later, overrides needed settings), to edit config then
+COPY  conf/wp-config.php  /var/www/wordpress/
+```
+## 3. Editing wp-config.php https://developer.wordpress.org/advanced-administration/wordpress/wp-config/
