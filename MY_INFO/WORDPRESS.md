@@ -225,3 +225,6 @@ root@0925a224b353:/# cat /var/www/wordpress/wp-config-sample.php
 COPY  conf/wp-config.php  /var/www/wordpress/
 ```
 ## 3. Editing wp-config.php https://developer.wordpress.org/advanced-administration/wordpress/wp-config/
+## 4. change config tabase settings (must come from your .env file  )
+### 5. change(copy/paste) API KEY in wp-config with: 
+root@0925a224b353:/# `curl https://api.wordpress.org/secret-key/1.1/salt/`

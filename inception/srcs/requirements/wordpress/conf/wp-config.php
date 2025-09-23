@@ -27,16 +27,17 @@ __________________________________
 
 // ** Database settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', 'database_name_here' );
+define( 'DB_NAME', getenv('DB_NAME')  ); //cahnged to my  envVariable DB_NAME' from .env
+
 
 /** Database username */
-define( 'DB_USER', 'username_here' );
+define( 'DB_USER', getenv('DB_USER') );
 
 /** Database password */
-define( 'DB_PASSWORD', 'password_here' );
+define( 'DB_PASSWORD', getenv('DB_PASSWORD'));
 
 /** Database hostname */
-define( 'DB_HOST', 'localhost' );
+define( 'DB_HOST', getenv('DB_HOST'));
 
 /** Database charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8' );
@@ -55,14 +56,14 @@ define( 'DB_COLLATE', '' );
  *
  * @since 2.6.0
  */
-define( 'AUTH_KEY',         'put your unique phrase here' );
-define( 'SECURE_AUTH_KEY',  'put your unique phrase here' );
-define( 'LOGGED_IN_KEY',    'put your unique phrase here' );
-define( 'NONCE_KEY',        'put your unique phrase here' );
-define( 'AUTH_SALT',        'put your unique phrase here' );
-define( 'SECURE_AUTH_SALT', 'put your unique phrase here' );
-define( 'LOGGED_IN_SALT',   'put your unique phrase here' );
-define( 'NONCE_SALT',       'put your unique phrase here' );
+define('AUTH_KEY',         '~M <#LV$;~XzJUK+dt.+RfkqIvSBgCbb}}{zDux$IiaxL=y^J[&7JCFpdXP|k{9|');
+define('SECURE_AUTH_KEY',  'I&pyZa69Ip{P6DMfs?gpo!%R2iX#H9M:HuY}&|MC5kIL&uVP|ol7%Aw_)t%3`Zr#');
+define('LOGGED_IN_KEY',    'J0i+x#({ W:l1GZP0I-tN[{#OanY3(v`s.b-|%#E(T;D)O#wrHrVr_@/vr|w8Lm%');
+define('NONCE_KEY',        'dF+R2F?-/ 460&Q+~n+VeCP3cS~KuU!AD:t+3^l12J(hD11tOh7Vc%^sr{S7bQ7S');
+define('AUTH_SALT',        'mRtKe>2pPeBi(-Xt/Hrn-VT]FF=<nK9RYIuzuCv)^)~|k%Q]2O4WZ7v>~}k`N0[3');
+define('SECURE_AUTH_SALT', '.XOjecO>moQ24@-(C_QSfW3!bdqOc[-TDAL+R4#M2=U+biNoyK@ xZSbw|AQa%?@');
+define('LOGGED_IN_SALT',   'j!6g%<#,?]S|`bs*G/4Z1^yzcq(g+[L+t6hL >[5&wGbG.R*UWsFb/$PC-ec|{|>');
+define('NONCE_SALT',       'hGe`pdXB@OQ+Tgc#P/^:II!1W>^5D&lF*;R<marnZudsO]^k@Q[z7.+m]084yEC-');
 
 /**#@-*/
 
