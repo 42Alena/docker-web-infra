@@ -12,7 +12,7 @@ services:
     networks:
       - inception
     volumes:
-      - wordpress:/var/www/wordpress
+      - wordpress_data:/var/www/wordpress 
     ports:
       - "443:443"
 
@@ -50,11 +50,14 @@ services:
 
 networks:
   inception:
+    name: inception
     driver: bridge
+
 
 # Persistent volumes (host paths in /home/akurmyza/data)
 volumes:
   mariadb_data:
+    name: mariadb_data     
     driver: local
     driver_opts:
       type: none
@@ -62,6 +65,7 @@ volumes:
       device: ${DATA_PATH}/mariadb
 
   wordpress_data:
+    name: wordpress_data   
     driver: local
     driver_opts:
       type: none

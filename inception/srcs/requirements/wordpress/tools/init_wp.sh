@@ -3,16 +3,17 @@
 # Safety: exit on error (-e) and on unset vars (-u). No -x to avoid leaking secrets.
 set -eu
 
-# wait indefinitely for MariaDB
-until nc -z mariadb 3306 2>/dev/null; do
-  echo "[init_wp] waiting for MariaDB..."
-  sleep 1
+
+# 🕒 Wait until MariaDB accepts queries
+echo "[init_wp] Waiting for MariaDB to be ready..."
+until mariadb -h"${DB_HOST}" -u"root" -p"${DB_ROOT_PASS}" -e "SELECT 1;" >/dev/null 2>&1; do
+  echo "[init_wp] .. still waiting for MariaDB..."
+  sleep 2
 done
+echo "[init_wp] ✅ MariaDB is ready!"
 
-# same as in Dockerfile already set WORKDIR /var/www/wordpress 
-# cd /var/www/wordpress
 
-#  @Task: creating "manager"(word "admin" in subject not alllowed) and user
+# WordPress install (WORKDIR is already /var/www/wordpress from Dockerfile)
 if ! wp core is-installed --allow-root; then
   echo "[init_wp] creating wp-config.php..."
   wp config create --allow-root \
@@ -21,7 +22,7 @@ if ! wp core is-installed --allow-root; then
     --dbpass="${DB_PASS}" \
     --dbhost="${DB_HOST}"
 
-  echo "[init_wp] core installing WP and creating manager(word admin not allowed)"
+  echo "[init_wp] core installing WP and creating manager (not 'admin')"
   wp core install --allow-root \
     --url="https://${DOMAIN_NAME}" \
     --title="inception" \
@@ -36,5 +37,5 @@ if ! wp core is-installed --allow-root; then
     --allow-root
 fi
 
-# run php-fpm in foreground with pid 1  
+# Run php-fpm in foreground with PID 1
 exec php-fpm8.2 -F
