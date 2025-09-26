@@ -95,3 +95,26 @@ env_file:
 Loads all variables from .env into the container.
 
 Easiest and matches the subject’s recommended practice
+
+--
+## Syntax : -inception vs [inception]
+…it means this service is attached to the network named inception.
+Internally Compose expects a list ([]) of network names, because a service can belong to multiple networks:
+
+networks: [inception]       # compact form = exactly same
+networks:
+  - inception               # long form (what you already use)
+
+- inception
+
+    The dash - means “this is a list item”.
+
+    Each line under networks: is one item.
+Inline (flow style list, in [ ])
+networks: [inception]
+The square brackets mean “list in inline style”.
+
+Same as above, but compact in one line.
+
+👉 Both forms are valid YAML, produce the same result, and Docker Compose treats them the same.
+It’s purely a style choice.

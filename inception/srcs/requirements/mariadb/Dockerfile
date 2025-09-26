@@ -2,8 +2,10 @@ FROM debian:bookworm
 
 RUN	apt update && \
 	apt install -y --no-install-recommends --no-install-suggests \
-	mariadb-server && \
+	mariadb-server  \
+    netcat-openbsd && \
 	rm -rf /var/lib/apt/lists/*
+
 
 # Ensure correct permissions
 RUN mkdir -p /var/lib/mysql /run/mysqld; \

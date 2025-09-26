@@ -39,12 +39,19 @@ done
 echo "[init_db.sh] Running initial SQL setup..."
 mysql --socket=/run/mysqld/mysqld.sock -u root <<-EOSQL
     ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASS}';
+    CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '${DB_ROOT_PASS}';     
+    GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;             
     FLUSH PRIVILEGES;
+
     CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;
     CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';
     GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'%';
     FLUSH PRIVILEGES;
 EOSQL
+
+# optional debug: verify DB + user exist
+echo "[init_db.sh] Verifying databases and grants..."   
+mysql --socket=/run/mysqld/mysqld.sock -u root -p"${DB_ROOT_PASS}" -e "SHOW DATABASES; SHOW GRANTS FOR '${DB_USER}'@'%';" 
 
 
 

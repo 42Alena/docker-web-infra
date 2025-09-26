@@ -328,3 +328,18 @@ MariaDB [wordpress]>
 # ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASS}';
 
  ALTER USER = SQL command to change an existing user account. Here we’re modifying the root account.
+
+
+ ----------
+ ## DB_HOST=mariadb:3306
+ nside Docker Compose, each service name (mariadb, wordpress, nginx) becomes a DNS hostname on the custom network (here: inception).
+That’s why WordPress can reach MariaDB simply by calling host mariadb.
+
+MariaDB listens on port 3306 (default). So the connection string is:
+mariadb:3306
+
+
+    → host = service name mariadb
+    → port = 3306
+
+This is needed because if you just set DB_HOST=localhost, WordPress inside its container would try to connect to itself, not the MariaDB container.

@@ -216,15 +216,26 @@ root@0925a224b353:/# cat /var/www/wordpress/wp-config-sample.php
  * The base configuration for WordPress
  *
 ```
-## 1. copytext from cat /var/www/wordpress/wp-config-sample.php  to my own conf/wp-config.php,
-## 2. dockerfile:
+### 1. copytext from cat /var/www/wordpress/wp-config-sample.php  to my own conf/wp-config.php,
+### 2. dockerfile:
 
 ```bash
  # Leave the original /var/www/wordpress/wp-config-sample.php  untouched
 # make copy from it to own (loaded later, overrides needed settings), to edit config then
 COPY  conf/wp-config.php  /var/www/wordpress/
 ```
-## 3. Editing wp-config.php https://developer.wordpress.org/advanced-administration/wordpress/wp-config/
-## 4. change config tabase settings (must come from your .env file  )
+### 3. Editing wp-config.php https://developer.wordpress.org/advanced-administration/wordpress/wp-config/
+### 4. change config tabase settings (must come from your .env file  )
 ### 5. change(copy/paste) API KEY in wp-config with: 
 root@0925a224b353:/# `curl https://api.wordpress.org/secret-key/1.1/salt/`
+___________
+# Step 4:  
+https://developer.wordpress.org/advanced-administration/before-install/howto-install/#step-5-run-the-install-script
+
+WordPress container
+
+Needs only one process in the end: php-fpm.
+
+Your init_wp.sh just prepares WordPress (creates config, installs users) and then starts php-fpm itself.
+
+You do not need a separate CMD, because php-fpm is already launched inside the script.

@@ -5,16 +5,16 @@ services:
       context: ./requirements/nginx
       dockerfile: Dockerfile
     image: nginx
-    ports:
-      - "443:443"
     env_file: ./.env
     restart: on-failure
-    # depends_on:
-    #   - wordpress
-    # networks:
-    #   - inception
-    #  volumes:
-    #   - wordpress:/var/www/wordpress   # share WordPress files
+    depends_on:
+      - wordpress
+    networks:
+      - inception
+    volumes:
+      - wordpress:/var/www/wordpress
+    ports:
+      - "443:443"
 
   mariadb:
     container_name: mariadb
@@ -24,12 +24,12 @@ services:
     image: mariadb
     env_file: ./.env
     restart: on-failure
-    # volumes:
-    #   - mariadb_data:/var/lib/mysql
-    # networks:
-    #   - inception
+    networks:
+      - inception
     expose:
       - "3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
 
   wordpress:
     container_name: wordpress
@@ -39,31 +39,31 @@ services:
     image: wordpress
     env_file: ./.env
     restart: on-failure
-    # depends_on:
-    #   - mariadb
-    # networks:
-    #   - inception
-    # volumes:
-    #   - wordpress:/var/www/wordpress
-    # expose:
-    #   - "9000"
-# networks:
-#   inception:
-#     driver: bridge
+    depends_on:
+      - mariadb
+    networks:
+      - inception
+    volumes:
+      - wordpress_data:/var/www/wordpress
+    expose:
+      - "9000"
 
-#TODO: volumes must mount last as everything work
+networks:
+  inception:
+    driver: bridge
+
 # Persistent volumes (host paths in /home/akurmyza/data)
-# volumes:
-#   mariadb_data:
-#     driver: local
-#     driver_opts:
-#       type: none
-#       o: bind
-#       device: ${DATA_PATH}/mariadb
+volumes:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_PATH}/mariadb
 
-# wordpress:
-#   driver: local
-#   driver_opts:
-#     type: none
-#     o: bind
-#     device: ${DATA_PATH}/wordpress
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATA_PATH}/wordpress
