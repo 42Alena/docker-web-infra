@@ -1,0 +1,54 @@
+services:
+  nginx:
+    container_name: nginx
+    build:
+      context: ./requirements/nginx
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    restart: on-failure
+    depends_on:
+      - wordpress
+    networks:
+      - inception
+    volumes:
+      - /home/akurmyza/data/wordpress:/var/www/wordpress
+    ports:
+      - "443:443"
+
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./requirements/mariadb
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    restart: on-failure
+    networks:
+      - inception
+    expose:
+      - "3306"
+    volumes:
+      - /home/akurmyza/data/mariadb:/var/lib/mysql
+
+  wordpress:
+    container_name: wordpress
+    build:
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    restart: on-failure
+    depends_on:
+      - mariadb
+    networks:
+      - inception
+    volumes:
+      - /home/akurmyza/data/wordpress:/var/www/wordpress
+    expose:
+      - "9000"
+
+networks:
+  inception:
+    name: inception
+    driver: bridge

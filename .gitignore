@@ -1,2 +1,19 @@
 # .env.save.in.virtualmashine only! dont push to git
+# Mac:
 /inception/srcs/.env
+# VM
+/inception_srcs/.env
+
+# Ignore private env
+srcs/.env
+
+# Keep only the template
+!srcs/.env.example
+
+# Ignore Docker artifacts
+**/.DS_Store
+**/*.log
+
+# Ignore editor/IDE configs
+.vscode/
+.idea/
