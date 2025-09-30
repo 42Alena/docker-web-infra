@@ -6,18 +6,22 @@ until mariadb -h"${DB_HOST}" -u"${DB_USER}" -p"${DB_PASS}" "${DB_NAME}" -e "SELE
   echo "[init_wp] .. still waiting for MariaDB..."
   sleep 2
 done
-echo "[init_wp] ✅ MariaDB is ready!"
+echo "[init_wp] MariaDB is ready!"
+sleep 3 # small safety buffer
 
-# WordPress install (WORKDIR is already /var/www/wordpress from Dockerfile)
-if ! wp core is-installed --allow-root; then
+# Create wp-config.php once (wp-cli writes constants from env)
+if [ ! -f wp-config.php ]; then
   echo "[init_wp] creating wp-config.php..."
   wp config create --allow-root \
     --dbname="${DB_NAME}" \
     --dbuser="${DB_USER}" \
     --dbpass="${DB_PASS}" \
     --dbhost="${DB_HOST}"
+fi
 
-  echo "[init_wp] core installing WP and creating manager (not 'admin')"
+# Install WordPress (idempotent)
+if ! wp core is-installed --allow-root; then
+  echo "[init_wp] installing WordPress and creating admin (not 'admin')"
   wp core install --allow-root \
     --url="https://${DOMAIN_NAME}" \
     --title="inception" \

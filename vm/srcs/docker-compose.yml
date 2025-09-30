@@ -1,5 +1,6 @@
 services:
   nginx:
+    image: nginx
     container_name: nginx
     build:
       context: ./requirements/nginx
@@ -12,11 +13,12 @@ services:
     networks:
       - inception
     volumes:
-      - /home/akurmyza/data/wordpress:/var/www/wordpress
+      - wordpress_data:/var/www/wordpress
     ports:
       - "443:443"
 
   mariadb:
+    image: mariadb
     container_name: mariadb
     build:
       context: ./requirements/mariadb
@@ -29,9 +31,10 @@ services:
     expose:
       - "3306"
     volumes:
-      - /home/akurmyza/data/mariadb:/var/lib/mysql
+      - mariadb_data:/var/lib/mysql
 
   wordpress:
+    image: wordpress
     container_name: wordpress
     build:
       context: ./requirements/wordpress
@@ -44,7 +47,7 @@ services:
     networks:
       - inception
     volumes:
-      - /home/akurmyza/data/wordpress:/var/www/wordpress
+      - wordpress_data:/var/www/wordpress
     expose:
       - "9000"
 
@@ -52,3 +55,19 @@ networks:
   inception:
     name: inception
     driver: bridge
+
+volumes:
+  wordpress_data:
+    name: wordpress_data              # explicit name (no project prefix)
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/akurmyza/data/wordpress
+  mariadb_data:
+    name: mariadb_data                # explicit name (no project prefix)
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/akurmyza/data/mariadb
